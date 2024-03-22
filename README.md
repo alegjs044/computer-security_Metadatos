@@ -1,6 +1,5 @@
 # computer-security_Metadatos
- El programa funciona para extraer metadatos de 3 tipos de Documentos: - Archivos docx - Archivos xlsx y Archivos PDF
-
+ El programa funciona para extraer metadatos de 3 tipos de Documentos: - Archivos docx - Archivos xlsx, Archivos PDF e imagenes.
  En este programa se usaron las siguientes librerias:
  
 | Package           | Version    |
@@ -14,6 +13,9 @@
 | python-docx       | 1.1.0      |
 | setuptools        | 68.1.2     |
 | typing_extensions | 4.10.0     |
+| pdfminer.six      | 20231228   |
+
+
 
 
 
