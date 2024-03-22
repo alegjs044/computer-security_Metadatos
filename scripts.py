@@ -1,10 +1,11 @@
 
+import os
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS, IFD
-import os
 from docx import Document
 from openpyxl import load_workbook
-import PyPDF2
+from pdfminer.pdfparser import PDFParser
+from pdfminer.pdfdocument import PDFDocument
 
 def get_image_metadata(image_path):
     image_metadata = {}
@@ -22,7 +23,7 @@ def get_image_metadata(image_path):
 def get_geo(exif):
     gps_info = exif.get(IFD.GPSInfo)
     gps_data = {}
-    if gps_info:
+    if isinstance(gps_info, dict): 
         for key, value in gps_info.items():
             tag = GPSTAGS.get(key)
             gps_data[tag] = value
@@ -40,10 +41,19 @@ def get_coordinates(gps_data):
 def extract_docx_metadata(docx_path):
     docx_metadata = {}
     doc = Document(docx_path)
-    for prop in doc.core_properties:
-        docx_metadata[prop] = str(getattr(doc.core_properties, prop))
-        print(f"{prop}: {docx_metadata[prop]}")
+    core_properties = doc.core_properties
+    
+    docx_metadata['Title'] = core_properties.title
+    docx_metadata['Author'] = core_properties.author
+    docx_metadata['Subject'] = core_properties.subject
+    docx_metadata['Keywords'] = core_properties.keywords
+    docx_metadata['Comments'] = core_properties.comments
+    
+    for prop, value in docx_metadata.items():
+        print(f"{prop}: {value}")
+        
     return docx_metadata
+
 
 def extract_xlsx_metadata(xlsx_path):
     xlsx_metadata = {}
@@ -56,11 +66,11 @@ def extract_xlsx_metadata(xlsx_path):
 def extract_pdf_metadata(pdf_path):
     pdf_metadata = {}
     with open(pdf_path, 'rb') as f:
-        reader = PyPDF2.PdfFileReader(f)
-        doc_info = reader.getDocumentInfo()
-        for key, value in doc_info.items():
-            pdf_metadata[key] = value
-            print(f"{key}: {value}")
+        parser = PDFParser(f)
+        doc = PDFDocument(parser)
+        for info in doc.info:
+            pdf_metadata[info] = doc.info[info]
+            print(f"{info}: {doc.info[info]}")
     return pdf_metadata
 
 if __name__ == "__main__":
