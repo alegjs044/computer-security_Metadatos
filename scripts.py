@@ -68,9 +68,12 @@ def extract_pdf_metadata(pdf_path):
     with open(pdf_path, 'rb') as f:
         parser = PDFParser(f)
         doc = PDFDocument(parser)
-        for info in doc.info:
-            pdf_metadata[info] = doc.info[info]
-            print(f"{info}: {doc.info[info]}")
+        info_dict = doc.info[0]  
+        for key, value in info_dict.items():
+            key_str = key.decode('latin-1') if isinstance(key, bytes) else key
+            value_str = value.decode('latin-1') if isinstance(value, bytes) else value
+            pdf_metadata[key_str] = value_str
+            print(f"{key_str}: {value_str}")
     return pdf_metadata
 
 if __name__ == "__main__":
